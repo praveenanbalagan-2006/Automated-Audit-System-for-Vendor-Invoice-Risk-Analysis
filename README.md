@@ -2,6 +2,7 @@
 The Automated Audit System for Vendor & Invoice Risk Analysis is a full-stack Python application that automates invoice auditing using OCR-based data extraction, SQL database storage, rule-based verification, and vendor risk analysis.
 The system processes invoice images, extracts key fields, verifies financial correctness, calculates vendor and invoice risk scores, and displays insights through a dashboard API.
 This project simulates a real-world financial audit automation system used in accounting, compliance, and fraud-prevention workflows.
+working link: https://hub.docker.com/repository/docker/praveenanbalagan/auto-audit-system/general
 
 🎯 Core Objectives
 
