@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 AutoAudit Invoice System v4.0</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg1: #0f172a;
+            --bg2: #1e293b;
+            --bg3: #334155;
+            --text1: #f1f5f9;
+            --text2: #cbd5e1;
+            --border: #475569;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg1);
+            color: var(--text1);
+            overflow-x: hidden;
+        }
+
+        .login-page {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-box {
+            background: var(--bg2);
+            border-radius: 12px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .login-box.active {
+            display: block;
+        }
+
+        .login-box h2 {
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 28px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .login-group {
+            margin-bottom: 20px;
+        }
+
+        .login-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text2);
+        }
+
+        .login-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text1);
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .login-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .demo-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .demo-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: flex;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h2 {
+            font-size: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--text2);
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: rgba(102, 126, 234, 0.15);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .nav-item i {
+            margin-right: 15px;
+            width: 20px;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-header {
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: var(--text2);
+            font-size: 14px;
+        }
+
+        .page-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stat-label {
+            color: var(--text2);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .upload-area {
+            background: var(--bg2);
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 60px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .upload-area h3 {
+            margin-bottom: 10px;
+        }
+
+        .processing-result {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+        }
+
+        .processing-result.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .result-card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .result-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 20px;
+            color: white;
+        }
+
+        .result-icon.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .result-icon.warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .result-label {
+            color: var(--text2);
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .result-value {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text1);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .invoices-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .invoices-table thead {
+            background: var(--bg3);
+        }
+
+        .invoices-table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text2);
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .invoices-table tbody tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .invoices-table tbody tr:hover {
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .invoices-table td {
+            padding: 15px;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.verified {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.needs-review {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-badge.flagged {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .status-badge.minimal {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .status-badge.low {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--info);
+        }
+
+        .status-badge.medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning);
+        }
+
+        .status-badge.high {
+            background: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+        }
+
+        .status-badge.critical {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .vendor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .vendor-card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .vendor-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .vendor-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .vendor-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .vendor-stat {
+            background: var(--bg3);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .vendor-stat label {
+            color: var(--text2);
+            font-size: 12px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .vendor-stat h4 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text2);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                flex-direction: row;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar-nav {
+                display: none;
+            }
+
+            .sidebar-nav.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: var(--bg2);
+                border-top: 1px solid var(--border);
+            }
+
+            .page-content {
+                padding: 20px;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .result-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .vendor-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .top-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div class="login-page" id="loginPage">
+        <div class="login-box active">
+            <h2><i class="fas fa-file-invoice"></i> AutoAudit</h2>
+            
+            <div class="login-group">
+                <label>Username</label>
+                <input type="text" id="username" placeholder="admin" value="admin">
+            </div>
+            
+            <div class="login-group">
+                <label>Password</label>
+                <input type="password" id="password" placeholder="Password" value="admin123">
+            </div>
+            
+            <button class="login-btn" onclick="login()">Login</button>
+            <button class="demo-btn" onclick="loginDemo()">Demo Login</button>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-file-invoice"></i> AutoAudit</h2>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-page="dashboard" onclick="switchPage('dashboard')">
+                    <i class="fas fa-chart-line"></i> <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-page="upload" onclick="switchPage('upload')">
+                    <i class="fas fa-cloud-upload-alt"></i> <span>Upload Invoice</span>
+                </button>
+                <button class="nav-item" data-page="history" onclick="switchPage('history')">
+                    <i class="fas fa-history"></i> <span>Invoice History</span>
+                </button>
+                <button class="nav-item" data-page="vendor" onclick="switchPage('vendor')">
+                    <i class="fas fa-building"></i> <span>Vendor Analysis</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <h1 id="pageTitle">Dashboard</h1>
+                    <p id="pageSubtitle">Welcome back!</p>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="dashboard-grid">
+                        <div class="stats-container">
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Total Spending</p>
+                                    <h3 class="stat-value" id="totalSpending">$0.00</h3>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Total Invoices</p>
+                                    <h3 class="stat-value" id="totalInvoices">0</h3>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                    <i class="fas fa-building"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">Total Vendors</p>
+                                    <h3 class="stat-value" id="totalVendors">0</h3>
+                                </div>
+                            </div>
+
+                            <div class="stat-card">
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div>
+                                    <p class="stat-label">High Risk Items</p>
+                                    <h3 class="stat-value" id="highRiskItems">0</h3>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="charts-section">
+                            <div class="chart-card">
+                                <h3>Spending by Vendor</h3>
+                                <canvas id="vendorChart"></canvas>
+                            </div>
+
+                            <div class="chart-card">
+                                <h3>Risk Distribution</h3>
+                                <canvas id="riskChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Page -->
+                <div id="upload-page" class="page">
+                    <h2 style="margin-bottom: 20px;">Upload Invoice</h2>
+                    
+                    <div class="upload-area" id="uploadArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h3>Drop invoice here or click to browse</h3>
+                        <input type="file" id="fileInput" hidden accept="image/*,application/pdf" onchange="handleFileUpload(event)">
+                        <button class="btn-primary" style="margin-top: 20px;" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open"></i> Select File
+                        </button>
+                    </div>
+
+                    <div style="text-align: center; margin: 30px 0;">
+                        <button class="btn-secondary" onclick="generateSample()">
+                            <i class="fas fa-magic"></i> Generate Sample Invoice
+                        </button>
+                    </div>
+
+                    <div id="processingResult" class="processing-result">
+                        <h3 style="margin-bottom: 20px;">Processing Result</h3>
+                        <div class="result-grid">
+                            <div class="result-card">
+                                <div class="result-icon success">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <p class="result-label">Verification</p>
+                                <h4 class="result-value" id="resultVerification">0/100</h4>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-icon warning">
+                                    <i class="fas fa-exclamation"></i>
+                                </div>
+                                <p class="result-label">Risk Score</p>
+                                <h4 class="result-value" id="resultRisk">0/100</h4>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-icon warning">
+                                    <i class="fas fa-percent"></i>
+                                </div>
+                                <p class="result-label">Fraud Risk</p>
+                                <h4 class="result-value" id="resultFraud">0%</h4>
+                            </div>
+
+                            <div class="result-card">
+                                <div class="result-icon success">
+                                    <i class="fas fa-dollar-sign"></i>
+                                </div>
+                                <p class="result-label">Total Amount</p>
+                                <h4 class="result-value" id="resultTotal">$0.00</h4>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg3); padding: 20px; border-radius: 8px;">
+                            <h4 style="margin-bottom: 15px;">Invoice Details</h4>
+                            <table style="width: 100%; font-size: 14px;">
+                                <tr>
+                                    <td style="color: var(--text2); padding: 8px 0;">Invoice #</td>
+                                    <td style="font-weight: 600; padding: 8px 0;" id="resultInvoiceNum">-</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--text2); padding: 8px 0;">Vendor</td>
+                                    <td style="font-weight: 600; padding: 8px 0;" id="resultVendor">-</td>
+                                </tr>
+                                <tr>
+                                    <td style="color: var(--text2); padding: 8px 0;">Status</td>
+                                    <td style="font-weight: 600; padding: 8px 0;" id="resultStatus">-</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Page -->
+                <div id="history-page" class="page">
+                    <h2 style="margin-bottom: 30px;">Invoice History</h2>
+                    <div class="table-responsive">
+                        <table class="invoices-table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Vendor</th>
+                                    <th>Date</th>
+                                    <th>Amount</th>
+                                    <th>Verification</th>
+                                    <th>Risk</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoiceTableBody">
+                                <tr><td colspan="7" class="empty-state">No invoices yet. Upload one to get started!</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Vendor Page -->
+                <div id="vendor-page" class="page">
+                    <h2 style="margin-bottom: 30px;">Vendor Analysis</h2>
+                    <div class="vendor-grid" id="vendorGrid">
+                        <div class="empty-state">
+                            <i class="fas fa-building"></i>
+                            <p>No vendor data available yet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let token = null;
+        let vendorChartInstance = null;
+        let riskChartInstance = null;
+
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.token) {
+                    token = data.token;
+                    localStorage.setItem('token', token);
+                    document.getElementById('loginPage').style.display = 'none';
+                    document.getElementById('appContainer').classList.add('active');
+                    loadDashboard();
+                } else {
+                    alert('❌ Invalid credentials. Try admin/admin123');
+                }
+            })
+            .catch(e => alert('❌ Login failed: ' + e));
+        }
+
+        function loginDemo() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+            login();
+        }
+
+        function logout() {
+            token = null;
+            localStorage.removeItem('token');
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('appContainer').classList.remove('active');
+        }
+
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(`${page}-page`).classList.add('active');
+
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.page === page) item.classList.add('active');
+            });
+
+            const titles = {
+                'dashboard': 'Dashboard',
+                'upload': 'Upload Invoice',
+                'history': 'Invoice History',
+                'vendor': 'Vendor Analysis'
+            };
+
+            document.getElementById('pageTitle').textContent = titles[page] || 'Page';
+
+            if (page === 'history') loadHistory();
+            if (page === 'vendor') loadVendors();
+        }
+
+        function loadDashboard() {
+            fetch('/api/dashboard', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(r => r.json())
+            .then(data => {
+                document.getElementById('totalSpending').textContent = '$' + data.total_spending.toFixed(2);
+                document.getElementById('totalInvoices').textContent = data.total_invoices;
+                document.getElementById('totalVendors').textContent = data.vendor_data.length;
+
+                const highRisk = data.vendor_data.filter(v => v.avg_risk > 60).length;
+                document.getElementById('highRiskItems').textContent = highRisk;
+
+                createCharts(data);
+            })
+            .catch(e => console.error('Dashboard error:', e));
+        }
+
+        function createCharts(data) {
+            const ctx1 = document.getElementById('vendorChart');
+            if (ctx1 && data.vendor_data.length > 0) {
+                const labels = data.vendor_data.map(v => v.vendor_name);
+                const values = data.vendor_data.map(v => v.total_amount);
+
+                if (vendorChartInstance) vendorChartInstance.destroy();
+
+                vendorChartInstance = new Chart(ctx1, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Amount ($)',
+                            data: values,
+                            backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: '#cbd5e1' },
+                                grid: { color: '#475569' }
+                            },
+                            x: { 
+                                ticks: { color: '#cbd5e1' },
+                                grid: { color: '#475569' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const ctx2 = document.getElementById('riskChart');
+            if (ctx2 && data.risk_distribution.length > 0) {
+                const labels = data.risk_distribution.map(r => r.risk_level);
+                const values = data.risk_distribution.map(r => r.count);
+                const colors = ['#10b981', '#3b82f6', '#f59e0b', '#fb923c', '#ef4444'];
+
+                if (riskChartInstance) riskChartInstance.destroy();
+
+                riskChartInstance = new Chart(ctx2, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: colors.slice(0, labels.length),
+                            borderColor: '#1e293b',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { labels: { color: '#cbd5e1' } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function loadHistory() {
+            fetch('/api/invoices', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(r => r.json())
+            .then(invoices => {
+                const tbody = document.getElementById('invoiceTableBody');
+                tbody.innerHTML = '';
+
+                if (invoices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No invoices found</td></tr>';
+                    return;
+                }
+
+                invoices.forEach(inv => {
+                    const row = `
+                        <tr>
+                            <td>${inv.invoice_number}</td>
+                            <td>${inv.vendor_name}</td>
+                            <td>${new Date(inv.created_at).toLocaleDateString()}</td>
+                            <td>$${inv.total.toFixed(2)}</td>
+                            <td>${inv.verification_score}/100</td>
+                            <td><span class="status-badge ${inv.risk_level.toLowerCase()}">${inv.risk_level}</span></td>
+                            <td><span class="status-badge ${inv.verification_status.toLowerCase().replace(/_/g, '-')}">${inv.verification_status}</span></td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(e => console.error('History error:', e));
+        }
+
+        function loadVendors() {
+            fetch('/api/dashboard', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(r => r.json())
+            .then(data => {
+                const grid = document.getElementById('vendorGrid');
+                
+                if (data.vendor_data.length === 0) {
+                    grid.innerHTML = '<div class="empty-state"><i class="fas fa-building"></i><p>No vendor data available yet</p></div>';
+                    return;
+                }
+
+                grid.innerHTML = '';
+                data.vendor_data.forEach(vendor => {
+                    const card = `
+                        <div class="vendor-card">
+                            <h3>${vendor.vendor_name}</h3>
+                            <div class="vendor-stats">
+                                <div class="vendor-stat">
+                                    <label>Invoices</label>
+                                    <h4>${vendor.invoice_count}</h4>
+                                </div>
+                                <div class="vendor-stat">
+                                    <label>Total</label>
+                                    <h4>$${vendor.total_amount.toFixed(2)}</h4>
+                                </div>
+                                <div class="vendor-stat">
+                                    <label>Avg Risk</label>
+                                    <h4>${vendor.avg_risk.toFixed(1)}</h4>
+                                </div>
+                                <div class="vendor-stat">
+                                    <label>Avg Invoice</label>
+                                    <h4>$${(vendor.total_amount / vendor.invoice_count).toFixed(2)}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    grid.innerHTML += card;
+                });
+            })
+            .catch(e => console.error('Vendor error:', e));
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('uploadArea').classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            document.getElementById('uploadArea').classList.remove('dragover');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function handleFileUpload(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                processFile(files[0]);
+            }
+        }
+
+        function processFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            document.getElementById('uploadArea').innerHTML = '<div class="loading"></div>';
+
+            fetch('/api/process', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                displayResult(data);
+                loadDashboard();
+                document.getElementById('uploadArea').innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Drop invoice here or click to browse</h3>
+                    <input type="file" id="fileInput" hidden accept="image/*,application/pdf" onchange="handleFileUpload(event)">
+                    <button class="btn-primary" style="margin-top: 20px;" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Select File
+                    </button>
+                `;
+            })
+            .catch(() => {
+                alert('Processing failed');
+                document.getElementById('uploadArea').innerHTML = `
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Drop invoice here or click to browse</h3>
+                    <input type="file" id="fileInput" hidden accept="image/*,application/pdf" onchange="handleFileUpload(event)">
+                    <button class="btn-primary" style="margin-top: 20px;" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open"></i> Select File
+                    </button>
+                `;
+            });
+        }
+
+        function displayResult(data) {
+            document.getElementById('resultVerification').textContent = data.verification_score + '/100';
+            document.getElementById('resultRisk').textContent = data.risk_score.toFixed(1) + '/100';
+            document.getElementById('resultFraud').textContent = (data.fraud_probability * 100).toFixed(1) + '%';
+            document.getElementById('resultTotal').textContent = '$' + data.total.toFixed(2);
+            document.getElementById('resultInvoiceNum').textContent = data.invoice_number;
+            document.getElementById('resultVendor').textContent = data.vendor;
+            document.getElementById('resultStatus').textContent = data.verification_status;
+
+            document.getElementById('processingResult').classList.add('show');
+        }
+
+        function generateSample() {
+            fetch('/api/sample', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(r => r.json())
+            .then(data => {
+                displayResult(data);
+                loadDashboard();
+                alert('✅ Sample invoice processed!');
+            })
+            .catch(() => alert('Failed to generate sample'));
+        }
+
+        window.addEventListener('load', () => {
+            const savedToken = localStorage.getItem('token');
+            if (savedToken) {
+                token = savedToken;
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+                loadDashboard();
+            }
+        });
+    </script>
+</body>
+</html>
