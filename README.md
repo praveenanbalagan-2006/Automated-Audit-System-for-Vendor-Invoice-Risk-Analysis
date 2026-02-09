@@ -60,3 +60,10 @@ Risk-level distribution across invoices
 JWT-based authentication
 Protected endpoints for invoices and dashboard
 Admin login system
+<img width="1896" height="932" alt="Screenshot 2026-02-09 202846" src="https://github.com/user-attachments/assets/37b41614-225e-435d-9d16-77589a3081e8" />
+<img width="1870" height="901" alt="Screenshot 2026-02-09 202857" src="https://github.com/user-attachments/assets/689ca299-f109-48a6-8fcb-a75693a47c07" />
+<img width="1919" height="959" alt="Screenshot 2026-02-09 202911" src="https://github.com/user-attachments/assets/5e9daf90-6c55-45e0-9953-575acc166c79" />
+<img width="1538" height="931" alt="Screenshot 2026-02-09 202922" src="https://github.com/user-attachments/assets/1c804623-8a64-4a5b-a224-e01aed3d581f" />
+
+
+
